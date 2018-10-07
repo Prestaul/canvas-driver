@@ -4,21 +4,21 @@ function Joystick({ el, r, maxValue, isVariable = true }) {
 	let vPosition = null;
 	let vStart = null;
 
-	el.addEventListener('touchstart', ({ touches }) => {
-		if(touches && touches.length) {
-			vStart = $v2(touches[0].pageX, touches[0].pageY);
+	el.addEventListener('touchstart', ({ targetTouches }) => {
+		if(targetTouches && targetTouches.length) {
+			vStart = $v2(targetTouches[0].pageX, targetTouches[0].pageY);
 		}
 	}, false);
 
-	el.addEventListener('touchmove', ({ touches }) => {
-		if(touches && touches.length) {
-			vPosition = $v2(touches[0].pageX, touches[0].pageY)
+	el.addEventListener('touchmove', ({ targetTouches }) => {
+		if(targetTouches && targetTouches.length) {
+			vPosition = $v2(targetTouches[0].pageX, targetTouches[0].pageY)
 				.sub(vStart);
 		}
 	}, false);
 
-	el.addEventListener('touchend', ({ touches }) => {
-		vPosition = null;
+	el.addEventListener('touchend', ({ targetTouches }) => {
+		if(!targetTouches.length) vPosition = null;
 	}, false);
 
 	return {
