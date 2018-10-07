@@ -22,6 +22,9 @@ function Joystick({ el, r, maxValue, isVariable = true }) {
 	}, false);
 
 	return {
+		get isPressed() {
+			return Boolean(vPosition && (vPosition.x || vPosition.y));
+		},
 		getValue() {
 			if(!vPosition) return $v2();
 

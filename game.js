@@ -1,6 +1,8 @@
 import { $v2 } from './HyPE.js';
 import Player from './player.js';
+import Bullet from './bullet.js';
 import MapConstraint from './map-constraint.js';
+import MapHitTest from './map-hit-test.js';
 import MapRenderer from './map-renderer.js';
 import renderGrid from './render-grid.js';
 import Joystick from './joystick.js';
@@ -9,22 +11,32 @@ import keyboardState from './keyboard-state.js';
 function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJoystickMove}) {
 	const ctxMap = elMap.getContext('2d');
 	const ctxPlayers = elPlayers.getContext('2d');
-	const SPEED = 8;
+	const SHIP_SPEED = 8;
+	const BULLET_SPEED = 5;
+	const BULLET_RATE = 100;
 	let running = false;
+	let bullets = [];
+	let lastBulletTime = Date.now();
 
 	const joystickShoot = Joystick({
 		el: elJoystickShoot,
 		r: 50,
-		maxValue: 1
+		maxValue: BULLET_SPEED,
+		isVariable: false
 	});
 
 	const joystickMove = Joystick({
 		el: elJoystickMove,
 		r: 50,
-		maxValue: SPEED
+		maxValue: SHIP_SPEED
 	});
 
 	const constrainMap = MapConstraint({
+		cellWidth: 100,
+		map: topMapData
+	});
+
+	const hitTestMap = MapHitTest({
 		cellWidth: 100,
 		map: topMapData
 	});
@@ -63,25 +75,41 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJ
 		renderBottomMap(vOffset);
 		renderTopMap(vOffset);
 
+		bullets.forEach(bullet => bullet.render(ctxPlayers, vOffset));
+
 		player.render(ctxPlayers, vOffset);
 	}
 
 	function tick() {
+		const time = Date.now();
+
 		if(keyboardState.left) {
-			player.pos.x -= SPEED;
+			player.pos.x -= SHIP_SPEED;
 		} else if (keyboardState.right) {
-			player.pos.x += SPEED;
+			player.pos.x += SHIP_SPEED;
 		}
 
 		if(keyboardState.up) {
-			player.pos.y -= SPEED;
+			player.pos.y -= SHIP_SPEED;
 		} else if (keyboardState.down) {
-			player.pos.y += SPEED;
+			player.pos.y += SHIP_SPEED;
 		}
 
 		player.move();
 
 		constrainMap(player);
+
+		if(joystickShoot.isPressed && (time - lastBulletTime) > BULLET_RATE) {
+			lastBulletTime = time;
+			bullets.push(new Bullet({
+				x: player.pos.x,
+				y: player.pos.y,
+				velocity: joystickShoot.getValue()
+			}));
+		}
+
+		bullets.forEach(bullet => bullet.move());
+		bullets = bullets.filter(bullet => !hitTestMap(bullet));
 
 		render();
 

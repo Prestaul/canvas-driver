@@ -11,9 +11,9 @@ const Player = Particle.extend(function({ x, y, r, invmass, vx, vy, movement, ta
 }, {
 	move() {
 		const m = this.movement.getValue();
-		const t = this.targeting.getValue();
-		if(t.x && t.y) this.angle = t.angle();
 		this.pos.translate(m.x, m.y);
+
+		if(this.targeting.isPressed) this.angle = this.targeting.getValue().angle();
 
 		return this;
 	},
