@@ -12,6 +12,12 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystick}) {
 	const SPEED = 8;
 	let running = false;
 
+	const movementJoystick = Joystick({
+		el: elJoystick,
+		r: 100,
+		maxValue: SPEED
+	});
+
 	const constrainMap = MapConstraint({
 		cellWidth: 100,
 		map: topMapData
@@ -36,13 +42,8 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystick}) {
 	const player = new Player({
 		x: 200,
 		y: 200,
-		r: 25
-	});
-
-	const movementJoystick = Joystick({
-		el: elJoystick,
-		r: 100,
-		maxValue: SPEED
+		r: 25,
+		movement: movementJoystick
 	});
 
 	function render() {
@@ -71,7 +72,7 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystick}) {
 			player.pos.y += SPEED;
 		}
 
-		player.move(movementJoystick.getValue());
+		player.move();
 
 		constrainMap(player);
 

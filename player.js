@@ -2,12 +2,17 @@ import { Particle } from './HyPE.js';
 
 const TWO_PI = Math.PI * 2;
 
-const Player = Particle.extend(function({ x, y, r, invmass, vx, vy }) {
+const Player = Particle.extend(function({ x, y, r, invmass, vx, vy, movement }) {
 	this.r = r;
+	this.movement = movement;
+	this.angle = 0;
 	return this._parent(x, y, invmass, vx, vy);
 }, {
-	move(velocity) {
-		this.pos.translate(velocity.x, velocity.y);
+
+	move() {
+		const m = this.movement.getValue();
+		if(m.x && m.y) this.angle = m.angle();
+		this.pos.translate(m.x, m.y);
 
 		return this;
 	},
@@ -22,11 +27,18 @@ const Player = Particle.extend(function({ x, y, r, invmass, vx, vy }) {
 
 		ctx.translate(pos.x - vOffset.x, pos.y - vOffset.y);
 
+		ctx.rotate(this.angle);
+
 		ctx.beginPath();
 		ctx.moveTo(r, 0);
 		ctx.arc(0, 0, r, 0, TWO_PI, false);
 
 		ctx.fill();
+
+		ctx.moveTo(0.2 * r, 0.3 * r);
+		ctx.lineTo(1.2 * r, 0.3 * r);
+		ctx.moveTo(0.2 * r, -0.3 * r);
+		ctx.lineTo(1.2 * r, -0.3 * r);
 		ctx.stroke();
 
 		ctx.restore();
