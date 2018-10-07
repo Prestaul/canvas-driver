@@ -25,10 +25,19 @@
 				left: 0;
 			}
 
+			#left-joystick {
+				position: absolute;
+				bottom: 75px;
+				left: 75px;
+			}
+
 			#right-joystick {
 				position: absolute;
 				bottom: 75px;
 				right: 75px;
+			}
+
+			.joystick {
 				width: 50px;
 				height: 50px;
 				border: 2px solid #77f;
@@ -73,6 +82,12 @@
 		<div id="workspace-wrapper">
 			<canvas id="map">Your browser really sucks...</canvas>
 			<canvas id="players">Your browser really sucks...</canvas>
+			<div id="left-joystick" class="joystick">
+				<div class="arrow arrow-up"></div>
+				<div class="arrow arrow-right"></div>
+				<div class="arrow arrow-down"></div>
+				<div class="arrow arrow-left"></div>
+			</div>
 			<div id="right-joystick" class="joystick">
 				<div class="arrow arrow-up"></div>
 				<div class="arrow arrow-right"></div>
@@ -104,14 +119,16 @@
 
 			const elMap = document.getElementById('map');
 			const elPlayers = document.getElementById('players');
-			const elJoystick = document.getElementById('right-joystick');
+			const elJoystickShoot = document.getElementById('right-joystick');
+			const elJoystickMove = document.getElementById('left-joystick');
 
 			const game = Game({
 				bottomMapData: BOTTOM_MAP,
 				topMapData: TOP_MAP,
 				elMap,
 				elPlayers,
-				elJoystick
+				elJoystickShoot,
+				elJoystickMove
 			}).resize(window.innerWidth, window.innerHeight).start();
 
 			addEventListener('keydown', e => {

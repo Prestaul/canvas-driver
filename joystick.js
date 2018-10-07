@@ -1,6 +1,6 @@
 import { $v2 } from './HyPE.js';
 
-function Joystick({ el, r, maxValue }) {
+function Joystick({ el, r, maxValue, isVariable = true }) {
 	let vPosition = null;
 	let vStart = null;
 
@@ -25,9 +25,15 @@ function Joystick({ el, r, maxValue }) {
 		getValue() {
 			if(!vPosition) return $v2();
 
-			const v = vPosition.clone().scale(maxValue / r);
+			const v =  vPosition.clone();
 
-			if(v.length() > maxValue) v.setLength(maxValue);
+			if(isVariable) {
+				v.scale(maxValue / r);
+
+				if(v.length() > maxValue) v.setLength(maxValue);
+			} else {
+				if(v.x || v.y) v.setLength(maxValue);
+			}
 
 			return v;
 		}

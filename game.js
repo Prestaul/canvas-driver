@@ -6,14 +6,20 @@ import renderGrid from './render-grid.js';
 import Joystick from './joystick.js';
 import keyboardState from './keyboard-state.js';
 
-function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystick}) {
+function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJoystickMove}) {
 	const ctxMap = elMap.getContext('2d');
 	const ctxPlayers = elPlayers.getContext('2d');
 	const SPEED = 8;
 	let running = false;
 
-	const movementJoystick = Joystick({
-		el: elJoystick,
+	const joystickShoot = Joystick({
+		el: elJoystickShoot,
+		r: 100,
+		maxValue: 1
+	});
+
+	const joystickMove = Joystick({
+		el: elJoystickMove,
 		r: 100,
 		maxValue: SPEED
 	});
@@ -43,7 +49,8 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystick}) {
 		x: 200,
 		y: 200,
 		r: 25,
-		movement: movementJoystick
+		movement: joystickMove,
+		targeting: joystickShoot
 	});
 
 	function render() {
@@ -52,7 +59,7 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystick}) {
 
 		const vOffset = renderTopMap.getOffset(player.pos);
 
-		renderGrid(elMap, 50, '#003');
+		renderGrid(elMap, 50, '#005');
 		renderBottomMap(vOffset);
 		renderTopMap(vOffset);
 

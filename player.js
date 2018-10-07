@@ -2,16 +2,17 @@ import { Particle } from './HyPE.js';
 
 const TWO_PI = Math.PI * 2;
 
-const Player = Particle.extend(function({ x, y, r, invmass, vx, vy, movement }) {
+const Player = Particle.extend(function({ x, y, r, invmass, vx, vy, movement, targeting }) {
 	this.r = r;
 	this.movement = movement;
+	this.targeting = targeting;
 	this.angle = 0;
 	return this._parent(x, y, invmass, vx, vy);
 }, {
-
 	move() {
 		const m = this.movement.getValue();
-		if(m.x && m.y) this.angle = m.angle();
+		const t = this.targeting.getValue();
+		if(t.x && t.y) this.angle = t.angle();
 		this.pos.translate(m.x, m.y);
 
 		return this;
