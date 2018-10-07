@@ -14,13 +14,13 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJ
 
 	const joystickShoot = Joystick({
 		el: elJoystickShoot,
-		r: 100,
+		r: 50,
 		maxValue: 1
 	});
 
 	const joystickMove = Joystick({
 		el: elJoystickMove,
-		r: 100,
+		r: 50,
 		maxValue: SPEED
 	});
 
