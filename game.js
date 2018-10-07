@@ -11,8 +11,8 @@ import keyboardState from './keyboard-state.js';
 function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJoystickMove}) {
 	const ctxMap = elMap.getContext('2d');
 	const ctxPlayers = elPlayers.getContext('2d');
-	const SHIP_SPEED = 8;
-	const BULLET_SPEED = 5;
+	const SHIP_SPEED = 5;
+	const BULLET_SPEED = 8;
 	const BULLET_RATE = 100;
 	let running = false;
 	let bullets = [];
