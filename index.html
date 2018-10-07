@@ -27,11 +27,45 @@
 
 			#right-joystick {
 				position: absolute;
-				bottom: 100px;
-				right: 100px;
+				bottom: 75px;
+				right: 75px;
 				width: 50px;
 				height: 50px;
-				border: 1px solid #f00;
+				border: 2px solid #77f;
+				border-radius: 50%;
+
+				display: grid;
+				grid-template-columns: repeat(3, 14px);
+				grid-template-rows: repeat(3, 14px);
+				grid-template-areas:
+					"......  up  ......"
+					"left   ....  right"
+					"...... down ......";
+				align-content: center;
+				justify-content: center;
+				grid-gap: 6px;
+			}
+
+			.arrow {
+				width: 0;
+				height: 0;
+				border: 7px solid transparent;
+			}
+			.arrow-up {
+				grid-area: up;
+				border-bottom-color: #77f;
+			}
+			.arrow-right {
+				grid-area: right;
+				border-left-color: #77f;
+			}
+			.arrow-down {
+				grid-area: down;
+				border-top-color: #77f;
+			}
+			.arrow-left {
+				grid-area: left;
+				border-right-color: #77f;
 			}
 		</style>
 	</head>
@@ -39,7 +73,12 @@
 		<div id="workspace-wrapper">
 			<canvas id="map">Your browser really sucks...</canvas>
 			<canvas id="players">Your browser really sucks...</canvas>
-			<div id="right-joystick" class="joystick"></div>
+			<div id="right-joystick" class="joystick">
+				<div class="arrow arrow-up"></div>
+				<div class="arrow arrow-right"></div>
+				<div class="arrow arrow-down"></div>
+				<div class="arrow arrow-left"></div>
+			</div>
 		</div>
 
 		<script type="module" crossorigin="anonymous">
