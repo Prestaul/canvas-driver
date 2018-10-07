@@ -101,10 +101,12 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJ
 
 		if(joystickShoot.isPressed && (time - lastBulletTime) > BULLET_RATE) {
 			lastBulletTime = time;
+			const velocity = joystickShoot.getValue();
+			const vPos = velocity.clone().setLength(player.r).translate(player.pos.x, player.pos.y);
 			bullets.push(new Bullet({
-				x: player.pos.x,
-				y: player.pos.y,
-				velocity: joystickShoot.getValue()
+				x: vPos.x,
+				y: vPos.y,
+				velocity
 			}));
 		}
 
