@@ -1,16 +1,31 @@
 <html>
 	<head>
-    <title>Canvas MOBA</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<title>Canvas Mobile Game</title>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-title" content="Canvas Mobile Game">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 		<style>
-			body {
+			html, body {
 				overflow: hidden;
+			}
+
+			body {
 				position: fixed;
+				top: 0;
+				left: 0;
 				margin: 0;
+				padding: 0;
 				width: 100%;
 				height: 100%;
 				background-color: #000;
-				/*zoom: 0.5;*/
+
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+
+				-webkit-tap-highlight-color: transparent;
+				-webkit-touch-callout: none;
 			}
 
 			#workspace-wrapper {
@@ -37,19 +52,19 @@
 
 			#left-joystick {
 				position: absolute;
-				bottom: 75px;
-				left: 75px;
+				bottom: 60px;
+				left: 60px;
 			}
 
 			#right-joystick {
 				position: absolute;
-				bottom: 75px;
-				right: 75px;
+				bottom: 60px;
+				right: 60px;
 			}
 
 			.joystick {
-				width: 50px;
-				height: 50px;
+				width: 75px;
+				height: 75px;
 				border: 2px solid #77f;
 				border-radius: 50%;
 
@@ -62,7 +77,7 @@
 					"...... down ......";
 				align-content: center;
 				justify-content: center;
-				grid-gap: 6px;
+				grid-gap: 8px;
 			}
 
 			.arrow {
@@ -111,14 +126,14 @@
 			import Game from './game.js';
 
 			const BOTTOM_MAP = [
-				[ 't', 'tr', 'tl','otl',     ],
-				[    ,  'r',  'l','obr',  'b'],
-				[    ,'otr','otl','otr',  't'],
-				[ 'b',  'b',  'b','obl',     ],
-				[ 't', 'tr', 'tl','otl',     ],
-				[    ,  'r',  'l','obr',  'b'],
-				[    ,'otr','otl','otr',  't'],
-				[    ,     ,     ,     ,     ]
+				[  't', 'tr', 'tl','otl',     ],
+				[     ,  'r',  'l','obr',  'b'],
+				[     ,'otr','otl','otr',  't'],
+				[  'b',  'b',  'b','obl',     ],
+				[  't', 'tr', 'tl','otl',     ],
+				[     ,  'r',  'l','obr',  'b'],
+				[     ,'otr','otl','otr',  't'],
+				['obr',  'b',  'b',  'b','obl']
 			];
 
 			const TOP_MAP = [
@@ -166,17 +181,17 @@
 				game.resize(window.innerWidth, window.innerHeight);
 			});
 
-			function requestFullScreen() {
+			function requestFullscreen() {
 				const docEl = document.documentElement;
-				const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+				const fullscreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
 
-				requestFullScreen.call(docEl);
+				fullscreen.call(docEl);
 			}
 
 			document.getElementById('start-button')
 				.addEventListener('click', ({ target }) => {
 					target.parentNode.removeChild(target);
-					requestFullScreen();
+					requestFullscreen();
 					game.start();
 				});
 		</script>
