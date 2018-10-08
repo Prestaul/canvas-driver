@@ -95,7 +95,7 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJ
 			player.pos.y += SHIP_SPEED;
 		}
 
-		player.move();
+		player.tick();
 
 		constrainMap(player);
 
@@ -110,7 +110,7 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJ
 			}));
 		}
 
-		bullets.forEach(bullet => bullet.move());
+		bullets.forEach(bullet => bullet.tick());
 		bullets = bullets.filter(bullet => !hitTestMap(bullet));
 
 		render();

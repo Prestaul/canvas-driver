@@ -9,7 +9,7 @@ const Player = Particle.extend(function({ x, y, r, invmass, vx, vy, movement, ta
 	this.angle = 0;
 	return this._parent(x, y, invmass, vx, vy);
 }, {
-	move() {
+	tick() {
 		const m = this.movement.getValue();
 		this.pos.translate(m.x, m.y);
 

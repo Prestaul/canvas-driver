@@ -7,7 +7,7 @@ const Bullet = Particle.extend(function({ x, y, velocity, invmass, vx, vy }) {
 	this.velocity = velocity;
 	return this._parent(x, y, invmass, vx, vy);
 }, {
-	move() {
+	tick() {
 		this.pos.translate(this.velocity.x, this.velocity.y);
 
 		return this;
