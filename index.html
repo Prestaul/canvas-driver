@@ -5,6 +5,11 @@
 		<meta name="apple-mobile-web-app-title" content="Canvas Mobile Game">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 		<style>
+			:root {
+				--control-color: #77f;
+				--modal-overlay-color: rgba(0, 0, 0, 0.6);
+			}
+
 			html, body {
 				overflow: hidden;
 			}
@@ -34,12 +39,49 @@
 				height: 100%;
 			}
 
+			#menu-burger {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				width: 30px;
+				height: 20px;
+				cursor: pointer;
+			}
+
+			#menu-burger rect {
+				fill: var(--control-color);
+			}
+
+			#menu {
+				display: none;
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: var(--modal-overlay-color);
+				align-items: center;
+				justify-content: center;
+			}
+			#menu.visible {
+				display: flex;
+			}
+
+			#menu ul {
+				list-style: none;
+			}
+
+			#menu button {
+				width: 200px;
+				margin: 10px;
+			}
+
 			#start-button {
 				position: absolute;
 				width: 100%;
 				height: 100%;
 				color: #fff;
-				background-color: rgba(100, 100, 100, 0.5);
+				background-color: var(--modal-overlay-color);
 				font-size: 30px;
 				text-decoration: underline;
 			}
@@ -65,7 +107,7 @@
 			.joystick {
 				width: 75px;
 				height: 75px;
-				border: 2px solid #77f;
+				border: 2px solid var(--control-color);
 				border-radius: 50%;
 
 				display: grid;
@@ -87,19 +129,19 @@
 			}
 			.arrow-up {
 				grid-area: up;
-				border-bottom-color: #77f;
+				border-bottom-color: var(--control-color);
 			}
 			.arrow-right {
 				grid-area: right;
-				border-left-color: #77f;
+				border-left-color: var(--control-color);
 			}
 			.arrow-down {
 				grid-area: down;
-				border-top-color: #77f;
+				border-top-color: var(--control-color);
 			}
 			.arrow-left {
 				grid-area: left;
-				border-right-color: #77f;
+				border-right-color: var(--control-color);
 			}
 		</style>
 	</head>
@@ -119,6 +161,18 @@
 				<div class="arrow arrow-down"></div>
 				<div class="arrow arrow-left"></div>
 			</div>
+			<div id="menu">
+				<ul>
+					<li><button id="host-game">Host a game</button></li>
+					<li><button id="connect-game">Connect to a game</button></li>
+					<li><button id="fullscreen">Return to full screen</button></li>
+				</ul>
+			</div>
+			<svg id="menu-burger" xmlns="http://www.w3.org/2000/svg">
+				<rect ry="10%" height="20%" width="100%" x="0" y="0" />
+				<rect ry="10%" height="20%" width="100%" x="0" y="40%" />
+				<rect ry="10%" height="20%" width="100%" x="0" y="80%" />
+			</svg>
 			<button id="start-button">Click for Full Screen</button>
 		</div>
 
@@ -194,6 +248,62 @@
 					requestFullscreen();
 					game.start();
 				});
+
+
+			const elMenu = document.getElementById('menu');
+			function toggleMenu() {
+				elMenu.classList.toggle('visible');
+				if(elMenu.classList.contains('visible')) {
+					game.stop();
+				} else {
+					game.start();
+				}
+			}
+
+			document.getElementById('menu-burger')
+				.addEventListener('click', toggleMenu);
+
+			document.getElementById('host-game')
+				.addEventListener('click', async () => {
+					const gameId = 'GAME_' + Math.round(Math.random() * parseInt('FFFFF', 16)).toString(16).padStart(5, '0').toUpperCase();
+					const copyWorked = await copyToClipboard(gameId);
+					if(copyWorked) {
+						alert(`Game ID (${gameId}) copied to clipboard.`);
+					} else {
+						alert(`Game ID: ${gameId}`);
+					}
+					toggleMenu();
+					setTimeout(requestFullscreen, 100);
+				});
+
+			document.getElementById('connect-game')
+				.addEventListener('click', () => {
+					prompt('Paste Game ID')
+					toggleMenu();
+					setTimeout(requestFullscreen, 100);
+				});
+
+			document.getElementById('fullscreen')
+				.addEventListener('click', () => {
+					requestFullscreen();
+					toggleMenu();
+				});
+
+			async function copyToClipboard(text) {
+				try {
+					await navigator.clipboard.writeText(text);
+					return true;
+				} catch(err) {
+					const input = document.createElement('input');
+					input.value = text;
+					document.body.appendChild(input);
+					input.focus();
+					input.select();
+					const copyWorked = document.execCommand('copy');
+					document.body.removeChild(input);
+					return copyWorked;
+				}
+			}
 		</script>
 	</body>
 </html>

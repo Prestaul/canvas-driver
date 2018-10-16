@@ -10,7 +10,7 @@ addEventListener('keydown', e => {
 
 	if(e.key.startsWith('Arrow')) {
 		e.preventDefault();
-		keyboardState[e.key.substr(5).toLowerCase()]	= true;
+		keyboardState[e.key.substr(5).toLowerCase()] = true;
 	}
 });
 
@@ -19,7 +19,7 @@ addEventListener('keyup', e => {
 
 	if(e.key.startsWith('Arrow')) {
 		e.preventDefault();
-		keyboardState[e.key.substr(5).toLowerCase()]	= false;
+		keyboardState[e.key.substr(5).toLowerCase()] = false;
 	}
 });
 
