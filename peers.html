@@ -1,0 +1,213 @@
+<html>
+	<head>
+		<title>Testing Peer.js</title>
+	</head>
+	<body>
+		<template id="client-template">
+			<div class="client">
+				<button class="host">Host</button>
+				<button class="connect">Connect to Host</button>
+				<button class="destroy" disabled="disabled">Destroy</button>
+				<div>
+					ID: <span class="peer-id">None</span>
+				</div>
+				<div>
+					Status: <span class="status">UNOPENED</span>
+				</div>
+				<div>
+					Connection Status: <span class="connection-status">UNOPENED</span>
+				</div>
+				<form>
+					<input type="text" placeholder="Text to send" />
+					<button class="send" disabled="disabled">Send</button>
+				</form>
+				<ul class="log"></ul>
+			</div>
+		</template>
+
+		<button id="add-client">Add Client</button>
+		<div id="clients"></div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.9/peer.min.js"></script>
+		<script>
+			const DEBUG = 2;
+			const tmplClient = document.getElementById('client-template');
+			const elClients = document.getElementById('clients');
+
+			document.getElementById('add-client').addEventListener('click', e => {
+				const client = createClient();
+				elClients.appendChild(client.node);
+			});
+
+			function createClient() {
+				const elClient = document.importNode(tmplClient.content, true);
+				const elHost = elClient.querySelector('button.host');
+				const elConnect = elClient.querySelector('button.connect');
+				const elDestroy = elClient.querySelector('button.destroy');
+				const elId = elClient.querySelector('.peer-id');
+				const elStatus = elClient.querySelector('.status');
+				const elConnectionStatus = elClient.querySelector('.connection-status');
+				const elData = elClient.querySelector('input');
+				const elForm = elClient.querySelector('form');
+				const elSend = elClient.querySelector('button.send');
+				const elLog = elClient.querySelector('ul.log');
+
+				const client = {
+					node: elClient,
+					isHost: false,
+					status: 'UNOPENED',
+					connectionStatus: 'UNOPENED',
+					peer: null,
+					connections: [],
+				};
+
+				function setStatus(status) {
+					if(status) client.status = status;
+					elStatus.innerHTML = status;
+				}
+
+				function setConnectionStatus(status) {
+					if(status) client.connectionStatus = status;
+					elConnectionStatus.innerHTML = `${client.connectionStatus} (${client.connections.length} connections)`;
+				}
+
+				function initConnection(conn) {
+					conn.on('open', () => {
+						console.log('CONNECTION OPEN', conn.peer);
+
+						if(client.isHost) {
+							send({
+								type: 'connection',
+								data: conn.peer
+							});
+						}
+
+						client.connections.push(conn);
+						setConnectionStatus('CONNECTED');
+						elSend.disabled = false;
+
+						conn.on('data', msg => {
+							console.log('DATA', conn.peer, msg);
+							if(msg.type === 'message') {
+								const li = document.createElement('li');
+								li.innerHTML = msg.data;
+								elLog.appendChild(li);
+							} else if (msg.type === 'connection') {
+								connect(msg.data);
+							}
+						});
+
+						conn.on('close', () => {
+							console.log('CONNECTION CLOSE', conn.peer);
+							client.connections = client.connections.filter(c => c !== conn);
+
+							if(!client.connections.length) {
+								setConnectionStatus('WAITING');
+								elSend.disabled = true;
+							} else {
+								setConnectionStatus();
+							}
+						});
+					});
+
+					conn.on('error', err => {
+						console.log('CONNECTION ERROR', conn.peer, error);
+						setConnectionStatus(`ERROR: ${err.message || err}`);
+					});
+				}
+
+				function initPeer() {
+					return new Promise((resolve, reject) => {
+						setStatus('INITIALIZING');
+						elHost.disabled = true;
+						elConnect.disabled = true;
+
+						const isSecure = location.protocol === 'https:';
+						const peer = client.peer = new Peer({
+							host: 'driver-server.glitch.me',
+							path: '/game-server',
+							port: isSecure ? 443 : 80,
+							secure: isSecure,
+							debug: DEBUG
+						});
+
+						peer.on('open', id => {
+							console.log('OPEN', id);
+
+							setStatus('OPEN');
+							setConnectionStatus('WAITING');
+							elDestroy.disabled = false;
+
+							elId.innerHTML = id;
+
+							peer.on('connection', conn => {
+								console.log('RECIEVING CONNECTION', conn.peer);
+								setConnectionStatus('RECIEVING');
+								initConnection(conn);
+							});
+
+							resolve(peer);
+						});
+
+						peer.on('close', () => {
+							console.log('CLOSE', peer.id);
+							setStatus('CLOSED');
+							elDestroy.disabled = true;
+						});
+
+						peer.on('disconnected', () => {
+							console.log('DISCONNECTED', peer.id);
+							setStatus('DISCONNECTED');
+						});
+
+						peer.on('error', err => {
+							console.log('ERROR', peer.id, err);
+							setStatus(`ERROR: ${err.message || err}`);
+							reject(err);
+						});
+					});
+				}
+
+				function connect(peerId) {
+					console.log('OPENING CONNECTION', peerId);
+					initConnection(client.peer.connect(peerId));
+				}
+
+				function destroy() {
+					client.peer.destroy();
+					setStatus('DESTROYING');
+				}
+
+				function send(data) {
+					client.connections.forEach(conn => conn.send(data));
+				}
+
+				elHost.addEventListener('click', () => {
+					client.isHost = true;
+					initPeer();
+				});
+
+				elConnect.addEventListener('click', async () => {
+					const peerId = prompt('Host ID');
+					if(!peerId) return;
+
+					const peer = client.peer || await initPeer();
+
+					connect(peerId);
+				});
+
+				elDestroy.addEventListener('click', destroy);
+
+				elForm.addEventListener('submit', e => {
+					e.preventDefault();
+					send({
+						type:'message',
+						data: elData.value,
+					});
+				});
+
+				return client;
+			}
+		</script>
+	</body>
+</html>
