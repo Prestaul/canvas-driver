@@ -1,6 +1,5 @@
 import { $v2 } from './HyPE.js';
 import Player from './player.js';
-import Bullet from './bullet.js';
 import MapConstraint from './map-constraint.js';
 import MapHitTest from './map-hit-test.js';
 import MapRenderer from './map-renderer.js';
@@ -13,10 +12,7 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJ
 	const ctxPlayers = elPlayers.getContext('2d');
 	const SHIP_SPEED = 5;
 	const BULLET_SPEED = 8;
-	const BULLET_RATE = 100;
 	let running = false;
-	let bullets = [];
-	let lastBulletTime = Date.now();
 
 	const joystickShoot = Joystick({
 		el: elJoystickShoot,
@@ -62,7 +58,8 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJ
 		y: 200,
 		r: 25,
 		movement: joystickMove,
-		targeting: joystickShoot
+		targeting: joystickShoot,
+		hitTestMap
 	});
 
 	function render() {
@@ -74,8 +71,6 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJ
 		renderGrid(elMap, 50, '#005');
 		renderBottomMap(vOffset);
 		renderTopMap(vOffset);
-
-		bullets.forEach(bullet => bullet.render(ctxPlayers, vOffset));
 
 		player.render(ctxPlayers, vOffset);
 	}
@@ -95,23 +90,9 @@ function Game({bottomMapData, topMapData, elMap, elPlayers, elJoystickShoot, elJ
 			player.pos.y += SHIP_SPEED;
 		}
 
-		player.tick();
+		player.tick(time);
 
 		constrainMap(player);
-
-		if(joystickShoot.isPressed && (time - lastBulletTime) > BULLET_RATE) {
-			lastBulletTime = time;
-			const velocity = joystickShoot.getValue();
-			const vPos = velocity.clone().setLength(player.r).translate(player.pos.x, player.pos.y);
-			bullets.push(new Bullet({
-				x: vPos.x,
-				y: vPos.y,
-				velocity
-			}));
-		}
-
-		bullets.forEach(bullet => bullet.tick());
-		bullets = bullets.filter(bullet => !hitTestMap(bullet));
 
 		render();
 
